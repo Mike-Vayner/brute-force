@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "Fail": {
+      "properties": {
+        "status": {
+          "const": 404,
+          "default": 404,
+          "title": "Status"
+        }
+      },
+      "title": "Fail",
+      "type": "object"
+    },
+    "Success": {
+      "properties": {
+        "status": {
+          "const": 200,
+          "default": 200,
+          "title": "Status"
+        },
+        "body": {
+          "title": "Body",
+          "type": "string"
+        }
+      },
+      "required": [
+        "body"
+      ],
+      "title": "Success",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "state": {
+      "discriminator": {
+        "mapping": {
+          "200": "#/$defs/Success",
+          "404": "#/$defs/Fail"
+        },
+        "propertyName": "status"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Success"
+        },
+        {
+          "$ref": "#/$defs/Fail"
+        }
+      ],
+      "title": "State"
+    }
+  },
+  "required": [
+    "state"
+  ],
+  "title": "Response",
+  "type": "object"
+}

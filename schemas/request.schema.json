@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "start": {
+      "title": "Start",
+      "type": "string"
+    },
+    "stop": {
+      "title": "Stop",
+      "type": "string"
+    },
+    "digest": {
+      "pattern": "^[a-f\\d]{32}$",
+      "title": "Digest",
+      "type": "string"
+    },
+    "charset": {
+      "default": "abcdefghijklmnopqrstuvwxyz",
+      "title": "Charset",
+      "type": "string"
+    }
+  },
+  "required": [
+    "start",
+    "stop",
+    "digest"
+  ],
+  "title": "Request",
+  "type": "object"
+}
