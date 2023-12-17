@@ -24,27 +24,34 @@ async def echo(
     executor: concurrent.futures.Executor | None = None,
 ):
     loop = asyncio.get_running_loop()
-    msg = await reader.read()
-    try:
-        request = Request.model_validate_json(msg)
-    except ValidationError:
-        writer.close()
-        await writer.wait_closed()
-        return
-    result = await loop.run_in_executor(
-        executor,
-        brute_force,
-        request.start,
-        request.stop,
-        request.digest,
-        request.charset,
-    )
-    if result is not None:
-        response = Response(state=Success(body=result))
-    else:
-        response = Response(state=Fail())
-    writer.write(response.model_dump_json().encode())
-    await writer.drain()
+    found = False
+    while not found:
+        msg = await reader.read()
+        try:
+            request = Request.model_validate_json(msg)
+        except ValidationError:
+            writer.close()
+            await writer.wait_closed()
+            return
+        result = await loop.run_in_executor(
+            executor,
+            brute_force,
+            request.start,
+            request.stop,
+            request.digest,
+            request.charset,
+        )
+        if result is not None:
+            response = Response(state=Success(body=result))
+            found = True
+        else:
+            response = Response(state=Fail())
+        try:
+            writer.write(response.model_dump_json().encode())
+            await writer.drain()
+        except ConnectionError:
+            print("Client disconnected early.")
+            break
 
 
 async def main():
